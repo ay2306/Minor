@@ -1,6 +1,7 @@
 let puppeteer = require('puppeteer');
 let fs = require('fs');
 let { execSync } = require('child_process');
+let axios = require('axios');
 function getRandomString(len){
     let str = "";
     while(str.length < len){
@@ -21,13 +22,16 @@ function timeout(ms) {
 
 
 (async()=>{
+    // let node = {"type":"central","downloadUrl":"localhost:8050/download?file=vwcnv405mlw8zkr.txt","uploadTime":962,"frequency":1,"downloadTime":3654};
+    // const res = await axios.post('http://127.0.0.1:8051/save',node);
+    // console.log(res);
     /*
         Generates a random file
     */
     const FREQUENCY = 1;
     let data = [];
     let fileName = getRandomString(15);
-    let fileSize = 1024*1024*getRandom(1,5);
+    let fileSize = 1024*1024*getRandom(1,1);
     console.log('creating file');
     await execSync(`python run.py ${fileName} ${fileSize}`);
     console.log('created file');
@@ -56,7 +60,9 @@ function timeout(ms) {
         end = new Date();
         node['downloadTime'] = end-start;        
         console.log("Time Take = ",end-start);
-        data.push(node);
+        node['size'] = fileSize;
+        // data.push(node);
+        await axios.post('http://127.0.0.1:8051/save',node);
     }
     for(let freq = 1; freq <= FREQUENCY; ++freq){
         await page.goto('localhost:8050/ipfsUpload');
@@ -83,14 +89,16 @@ function timeout(ms) {
         await page.goto(node['downloadUrl']);
         end = new Date();
         node['downloadTime'] = end-start;
-        data.push(node);
-        
+        node['size'] = fileSize;
+        // data.push(node);
+        await axios.post('http://127.0.0.1:8051/save',node);
     }
     browser.close();
+    await execSync(`python deleteFile.py ${fileName}`);
 })()
 .then(()=>{
     console.log("Executed Correctly")
 })
 .catch((err)=>{
-    console.log(err);
+    console.log(err.message);
 })
