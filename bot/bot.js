@@ -28,17 +28,18 @@ function timeout(ms) {
     /*
         Generates a random file
     */
-    const FREQUENCY = 1;
+    const minorDataUrl = 'http://127.0.0.1:8051/save';
+    const FREQUENCY = getRandom(2,5);
     let data = [];
     let fileName = getRandomString(15);
-    let fileSize = 1024*1024*getRandom(1,1);
+    let fileSize = 1024*getRandom(1024,1*1024);
     console.log('creating file');
     await execSync(`python run.py ${fileName} ${fileSize}`);
     console.log('created file');
     let browser = await puppeteer.launch({headless:false});   
     let page = await browser.newPage();
     for(let freq = 1; freq <= FREQUENCY; ++freq){
-        await page.goto('localhost:8050/upload');
+        await page.goto('localhost:8050/upload',{timeout: 0});
         let element  = await page.$('#fileIn');
         element.uploadFile(fileName);
         let click = await page.$('#uploadClick');
@@ -55,17 +56,17 @@ function timeout(ms) {
         node['frequency'] = freq;
         
         start = new Date();
-        await page.goto(node['downloadUrl']);
+        await page.goto(node['downloadUrl'],{timeout:0});
         // await page.waitForNavigation({waitUntil: 'networkidle0',timeout:0});
         end = new Date();
         node['downloadTime'] = end-start;        
         console.log("Time Take = ",end-start);
         node['size'] = fileSize;
         // data.push(node);
-        await axios.post('http://127.0.0.1:8051/save',node);
+        await axios.post(minorDataUrl,node);
     }
     for(let freq = 1; freq <= FREQUENCY; ++freq){
-        await page.goto('localhost:8050/ipfsUpload');
+        await page.goto('localhost:8050/ipfsUpload',{timeout: 0});
         let element  = await page.$('#fileIn');
         console.time('upload');
         element.uploadFile(fileName);   
@@ -86,12 +87,12 @@ function timeout(ms) {
         node['frequency'] = freq;
         
         start = new Date();
-        await page.goto(node['downloadUrl']);
+        await page.goto(node['downloadUrl'],{timeout:0});
         end = new Date();
         node['downloadTime'] = end-start;
         node['size'] = fileSize;
         // data.push(node);
-        await axios.post('http://127.0.0.1:8051/save',node);
+        await axios.post(minorDataUrl,node);
     }
     browser.close();
     await execSync(`python deleteFile.py ${fileName}`);
