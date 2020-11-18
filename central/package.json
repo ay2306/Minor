@@ -5,8 +5,7 @@
   "main": "server.js",
   "scripts": {
     "build": "tsc",
-    "start-development": "npm run build && node ./dist/server.js",
-    "start-production": "npm run build && NODE_ENV=production node ./dist/server.js"
+    "start": "npm run build && node ./dist/server.js"
   },
   "keywords": [
     "IPFS",

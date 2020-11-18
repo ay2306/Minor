@@ -21,7 +21,7 @@
         function fileSelect(input){
             var file = input.files[0];
 
-            console.log(file);
+            // console.log(file);
 
             let reader = new FileReader();
 
@@ -32,16 +32,16 @@
 
                 await node.files.touch('/' + file.name);
                 var res = await node.files.write('/' + file.name, file);
-                console.log(res);
+                // console.log(res);
 
                 var res = await node.add(file);
-                console.log(res.cid);
-                console.log(res.cid.string);
+                // console.log(res.cid);
+                // console.log(res.cid.string);
 
                 for await (const fle of node.files.ls('/')) {
                     if (fle.name == file.name){
-                        console.log(fle.cid.string);
-                        window.open('https://ipfs.io/ipfs/' + fle.cid.string + '?filename=' + fle.cid.string);
+                        // console.log(fle.cid.string);
+                        window.location.replace('https://ipfs.io/ipfs/' + fle.cid.string + '?filename=' + fle.cid.string);
                     }
                 }
             }
@@ -54,6 +54,14 @@
     <p>Note that opening two tabs of this page in the same browser won't work well, because they will share node configuration. You'll end up trying to run two instances of the same node, with the same private key and identity, which is a Bad Idea.</p>
     <h1 id="status">Node status: offline</h1>
 
-    <input type="file" name="somefile" id="fileIn" onchange="fileSelect(this)">
+    <!-- <input type="file" name="somefile" id="fileIn" onchange="fileSelect(this)"> -->
+    <input type="file" name="somefile" id="fileIn">
+    <button id="uploadIPFS">Upload</button>
+    <script>
+        document.getElementById("uploadIPFS").addEventListener('click',function(event){
+            console.log('init');
+            fileSelect(document.getElementById('fileIn'));
+        })
+    </script>
 </body>
 </html>

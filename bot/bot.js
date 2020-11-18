@@ -1,6 +1,6 @@
-const puppeteer = require('puppeteer');
-const fs = require('fs');
-const { execSync } = require('child_process');
+let puppeteer = require('puppeteer');
+let fs = require('fs');
+let { execSync } = require('child_process');
 function getRandomString(len){
     let str = "";
     while(str.length < len){
@@ -11,44 +11,82 @@ function getRandomString(len){
     return str;
 }
 
-const randomFile = async (fileSize)=>{
+function getRandom(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) ) + min;
 }
+
+function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 
 (async()=>{
     /*
         Generates a random file
     */
-   const fileName = getRandomString(15);
-   let fileSize = 1024*1024;
-   console.log('creating file');
+    const FREQUENCY = 1;
+    let data = [];
+    let fileName = getRandomString(15);
+    let fileSize = 1024*1024*getRandom(1,5);
+    console.log('creating file');
     await execSync(`python run.py ${fileName} ${fileSize}`);
     console.log('created file');
-
-    const browser = await puppeteer.launch({headless:false});   
-    const page = await browser.newPage();
-    {
-        // await page.goto('localhost:8050/upload');
-        // const element  = await page.$('#fileIn');
-        // element.uploadFile(fileName);
-        // const click = await page.$('#uploadClick');
-        // const start = new Date();
-        // await click.click();
-        // await page.waitForNavigation({waitUntil: 'networkidle0'});
-        // const end = new Date();
-        // console.log("Time Take = ",end-start);
-        // await page.goto('localhost:8050/upload');
+    let browser = await puppeteer.launch({headless:false});   
+    let page = await browser.newPage();
+    for(let freq = 1; freq <= FREQUENCY; ++freq){
+        await page.goto('localhost:8050/upload');
+        let element  = await page.$('#fileIn');
+        element.uploadFile(fileName);
+        let click = await page.$('#uploadClick');
+        let start = new Date();
+        await click.click();
+        await page.waitForNavigation({waitUntil: 'networkidle0'});
+        let end = new Date();
+        console.log("Time Take = ",end-start);
+        
+        let node = {};
+        node['type'] = 'central';
+        node['downloadUrl'] = 'localhost:8050/download?file=' + fileName;
+        node['uploadTime'] = end - start;
+        node['frequency'] = freq;
+        
+        start = new Date();
+        await page.goto(node['downloadUrl']);
+        // await page.waitForNavigation({waitUntil: 'networkidle0',timeout:0});
+        end = new Date();
+        node['downloadTime'] = end-start;        
+        console.log("Time Take = ",end-start);
+        data.push(node);
     }
-    {
+    for(let freq = 1; freq <= FREQUENCY; ++freq){
         await page.goto('localhost:8050/ipfsUpload');
-        const element  = await page.$('#fileIn');
+        let element  = await page.$('#fileIn');
         console.time('upload');
         element.uploadFile(fileName);   
-        // element.uploadFile('Money.Heist.S04E08.720p.English.WebDL.@Amazon_Prime_Video_HD.mp4');
-        // const click = await page.$('#uploadClick');
-        // await click.click();
-        await page.waitForNavigation({waitUntil: 'networkidle0'});
-        console.timeEnd('upload');
+        let click = await page.$('#uploadIPFS');
+        let start = new Date();
+        await timeout(5000);
+        console.log("5000");
+        await click.click();
+        await page.waitForNavigation({waitUntil: 'networkidle0',timeout:0});
+        let end = new Date();
+        console.log(page.url());
+        console.log("Time Take = ",end-start);
+        
+        let node = {};
+        node['type'] = 'distributed';
+        node['downloadUrl'] = page.url();
+        node['uploadTime'] = end - start;
+        node['frequency'] = freq;
+        
+        start = new Date();
+        await page.goto(node['downloadUrl']);
+        end = new Date();
+        node['downloadTime'] = end-start;
+        data.push(node);
+        
     }
+    browser.close();
 })()
 .then(()=>{
     console.log("Executed Correctly")
