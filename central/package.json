@@ -1,0 +1,31 @@
+{
+  "name": "central",
+  "version": "1.0.0",
+  "description": "This is the central server created for the research paper on IPFS ",
+  "main": "server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "npm run build && node ./dist/server.js"
+  },
+  "keywords": [
+    "IPFS",
+    "Centralized",
+    "Research-Work"
+  ],
+  "author": "CSE-2 2017-2021 Group 5",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "ejs": "^3.1.5",
+    "express": "^4.17.1",
+    "multer": "^1.4.2",
+    "path": "^0.12.7",
+    "typescript": "^4.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.6",
+    "tsc": "^1.20150623.0"
+  }
+}

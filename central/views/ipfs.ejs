@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+    <title>IPFS in the Browser</title>
+    <script src="https://cdn.jsdelivr.net/npm/ipfs/dist/index.min.js"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', async () => {
+        const node = await Ipfs.create({ repo: 'ipfs-' + Math.random() })
+        window.node = node
+
+        const status = node.isOnline() ? 'online' : 'offline'
+
+        console.log(`Node status: ${status}`)
+        document.getElementById('status').innerHTML = `Node status: ${status}`
+
+        // You can write more code here to use it. Use methods like
+        // node.add, node.get. See the API docs here:
+        // https://github.com/ipfs/js-ipfs/tree/master/packages/interface-ipfs-core
+        })
+
+        function fileSelect(input){
+            var file = input.files[0];
+
+            // console.log(file);
+
+            let reader = new FileReader();
+
+            reader.readAsArrayBuffer(file);
+
+            reader.onloadend = async function(){
+                let a = reader.result;
+
+                await node.files.touch('/' + file.name);
+                var res = await node.files.write('/' + file.name, file);
+                // console.log(res);
+
+                var res = await node.add(file);
+                // console.log(res.cid);
+                // console.log(res.cid.string);
+
+                for await (const fle of node.files.ls('/')) {
+                    if (fle.name == file.name){
+                        // console.log(fle.cid.string);
+                        window.location.replace('https://ipfs.io/ipfs/' + fle.cid.string + '?filename=' + fle.cid.string);
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>IPFS in the Browser</h1>
+    <p>This page creates an IPFS node in your browser and drops it into the global Javascript namespace as <b><em style="background-color:#d7d6d6">node</em></b>. Open the console to play around with it.</p>
+    <p>Note that opening two tabs of this page in the same browser won't work well, because they will share node configuration. You'll end up trying to run two instances of the same node, with the same private key and identity, which is a Bad Idea.</p>
+    <h1 id="status">Node status: offline</h1>
+
+    <!-- <input type="file" name="somefile" id="fileIn" onchange="fileSelect(this)"> -->
+    <input type="file" name="somefile" id="fileIn">
+    <button id="uploadIPFS">Upload</button>
+    <script>
+        document.getElementById("uploadIPFS").addEventListener('click',function(event){
+            console.log('init');
+            fileSelect(document.getElementById('fileIn'));
+        })
+    </script>
+</body>
+</html>
