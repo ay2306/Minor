@@ -12,7 +12,7 @@ var storage = multer.diskStorage({
     },
     filename: function (req, file, cb) {
         // console.log(file);
-        cb(null, file.originalname + '-' + Date.now());
+        cb(null, file.originalname);
     }
 });
 const upload = multer({ storage: storage });
@@ -23,6 +23,7 @@ class UploadRoutes {
     routes(app) {
         app.post('/upload', upload.single('fileName'), this.uploadController.uploadFile);
         app.get('/upload', this.uploadController.serveFile);
+        app.get('/ipfsUpload', this.uploadController.ipfsUpload);
     }
 }
 exports.UploadRoutes = UploadRoutes;

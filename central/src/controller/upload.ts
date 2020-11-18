@@ -5,4 +5,7 @@ export class UploadController{
     public uploadFile = (req,res)=>{
         res.render('index');
     }
+    public ipfsUpload = (req,res)=>{
+        res.render('ipfs');
+    }
 }

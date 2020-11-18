@@ -9,6 +9,9 @@ class UploadController {
         this.uploadFile = (req, res) => {
             res.render('index');
         };
+        this.ipfsUpload = (req, res) => {
+            res.render('ipfs');
+        };
     }
 }
 exports.UploadController = UploadController;
