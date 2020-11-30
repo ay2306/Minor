@@ -36,10 +36,10 @@ function timeout(ms) {
     console.log('creating file');
     await execSync(`python run.py ${fileName} ${fileSize}`);
     console.log('created file');
-    let browser = await puppeteer.launch({headless:false});   
+    let browser = await puppeteer.launch({headless:true});   
     let page = await browser.newPage();
     for(let freq = 1; freq <= FREQUENCY; ++freq){
-        await page.goto('localhost:8050/upload',{timeout: 0});
+        await page.goto('http://127.0.0.1:8050/upload',{timeout: 0});
         let element  = await page.$('#fileIn');
         element.uploadFile(fileName);
         let click = await page.$('#uploadClick');

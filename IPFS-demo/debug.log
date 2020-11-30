@@ -4,14 +4,14 @@ Swarm listening on /ip4/127.0.0.1/tcp/4003/ws/p2p/QmeRzq3P2r8Rzhj92QLgcwVQYaMRvH
 
 TIMING FOR INIT
 
-Execution time: 5012
-Execution time (sec): 5 11.1333
+Execution time: 5037
+Execution time (sec): 5 36.658099
 NODE CREATED
 
 TIMING FOR ADDFILE FUNCTION
 
-Execution time: 127
-Execution time (sec): 0 126.8209
+Execution time: 202
+Execution time (sec): 0 202.1613
 ADDED
 {
   path: 'hello.txt',
@@ -26,8 +26,8 @@ Added file contents:
 
 TIMING FOR CAT FUNCTION
 
-Execution time: 163
-Execution time (sec): 0 163.246701
+Execution time: 223
+Execution time (sec): 0 222.9896
 FILE CONTENTS
 Hello World 101
 Stopped
